@@ -9,46 +9,17 @@ pr:
       - '*'
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'amazonlinux2'
 
 steps:
 - task: UsePythonVersion@0
   inputs:
-    versionSpec: '3.x'
+    versionSpec: '3.10'
     addToPath: true
 
 - script: |
     python -m pip install --upgrade pip
-    pip install -r LambdaLayer/requirements.txt
   displayName: 'Install Lambda Layer Dependencies'
 
 - script: |
-    cd LambdaFunction
-    pip install --upgrade pip
-    pip install -r requirements.txt
-  displayName: 'Install Lambda Function Dependencies'
-
-- script: |
-    cd LambdaFunction
-    aws cloudformation package --template-file template.yaml --s3-bucket <your-s3-bucket> --output-template-file packaged-template.yaml
-  displayName: 'Package Lambda Function'
-
-- script: |
-    cd LambdaFunction
-    aws cloudformation deploy --template-file packaged-template.yaml --stack-name <your-stack-name> --capabilities CAPABILITY_IAM
-  displayName: 'Deploy Lambda Function'
-
-- script: |
-    aws logs create-log-group --log-group-name <your-log-group-name1>
-    aws logs create-log-group --log-group-name <your-log-group-name2>
-    # Repeat the above command for each log group you want to create
-  displayName: 'Create Log Groups'
-
-- script: |
-    aws logs put-resource-policy --policy-name <your-policy-name> --policy-document file://log-policy.json
-  displayName: 'Configure Log Group Policy'
-
-- script: |
-    aws apigateway create-deployment --rest-api-id <your-rest-api-id> --stage-name <your-stage-name>
-  displayName: 'Deploy API Gateway'
-
+    python main.py
